@@ -1,0 +1,1830 @@
+{
+  "name": "Conjur",
+  "version": "1",
+  "items": [
+    {
+      "type": "folder",
+      "name": "Auth",
+      "items": [
+        {
+          "type": "http",
+          "name": "LOGIN",
+          "seq": 1,
+          "request": {
+            "url": "https://{{CONJUR_URL}}/authn/{{ACCOUNT}}/login",
+            "method": "GET",
+            "headers": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "basic",
+              "basic": {
+                "username": "{{ADMIN}}",
+                "password": "{{PASSWORD}}"
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {
+              "res": "let data = res.getBody();\nlet token = bru.setEnvVar(\"APIKEY\", data);\n"
+            },
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "AUTHENTICATE",
+          "seq": 2,
+          "request": {
+            "url": "https://{{CONJUR_URL}}/authn/{{ACCOUNT}}/admin/authenticate?Accept-Encoding=base64",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "Accept-Encoding",
+                "value": "base64",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "text",
+              "text": "{{APIKEY}}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "token=\"\""
+              }
+            },
+            "script": {
+              "res": "let data = res.getBody();\nlet token = bru.setEnvVar(\"TOKEN\", data);"
+            },
+            "vars": {
+              "req": [
+                {
+                  "name": "Accept-Encoding",
+                  "value": "base64",
+                  "enabled": true,
+                  "local": false
+                }
+              ],
+              "res": [
+                {
+                  "name": "Accept-Encoding",
+                  "value": "base64",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [],
+            "tests": "",
+            "query": [
+              {
+                "name": "Accept-Encoding",
+                "value": "base64",
+                "enabled": true
+              }
+            ]
+          }
+        },
+        {
+          "type": "http",
+          "name": "Rotate API Key admin",
+          "seq": 3,
+          "request": {
+            "url": "https://{{CONJUR_URL}}/authn/{{ACCOUNT}}/api_key",
+            "method": "PUT",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": "Token token=\"{{TOKEN}}\"",
+                "enabled": true
+              },
+              {
+                "name": "Accept-Encoding",
+                "value": "base64",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "basic",
+              "basic": {
+                "username": "admin",
+                "password": "xxx"
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {
+              "res": "let data = res.getBody();\nlet token = bru.setEnvVar(\"APIKEY\", data);\n"
+            },
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "Change User password",
+          "seq": 4,
+          "request": {
+            "url": "https://{{CONJUR_URL}}/authn/{{ACCOUNT}}/password",
+            "method": "PUT",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "text/plain",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "text",
+              "text": "123qwe",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "basic",
+              "basic": {
+                "username": "{{ADMIN}}",
+                "password": "{{PASSWORD}}"
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"Password Changed\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(204);\n});",
+            "query": []
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Query",
+      "items": [
+        {
+          "type": "folder",
+          "name": "Show Resource",
+          "items": [
+            {
+              "type": "http",
+              "name": "Variable",
+              "seq": 1,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}/variable/vault1/lob1/k8s-demo/demoaslan/password",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Accept-Encoding",
+                    "value": "base64",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            },
+            {
+              "type": "http",
+              "name": "Host",
+              "seq": 2,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}/host/gitlab-apps/aslan_carlos",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Accept-Encoding",
+                    "value": "base64",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            },
+            {
+              "type": "http",
+              "name": "Group",
+              "seq": 3,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}/group/conjur/authn-jwt/k8s-cluster1/consumers",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Accept-Encoding",
+                    "value": "base64",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "Retrieval",
+          "items": [
+            {
+              "type": "http",
+              "name": "Batch Secrets",
+              "seq": 2,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/secrets?variable_ids={{ACCOUNT}}:variable:{{SECRET2}},{{ACCOUNT}}:variable:{{SECRET1}}",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Accept-Encoding",
+                    "value": "base64",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": [
+                  {
+                    "name": "variable_ids",
+                    "value": "{{ACCOUNT}}:variable:{{SECRET2}},{{ACCOUNT}}:variable:{{SECRET1}}",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "Define Secret",
+              "seq": 1,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/secrets/{{ACCOUNT}}/variable/{{SECRET1}}",
+                "method": "POST",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Accept-Encoding",
+                    "value": "base64",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "text",
+                  "text": "k8sdemo_user1",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            },
+            {
+              "type": "http",
+              "name": "Get Secret latest",
+              "seq": 4,
+              "request": {
+                "url": "https://{{CONJUR_URL}}//authn/{{ACCOUNT}}/api_key",
+                "method": "PUT",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Accept-Encoding",
+                    "value": "base64",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            },
+            {
+              "type": "http",
+              "name": "Get Secret versioned",
+              "seq": 3,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/secrets/{{ACCOUNT}}/variable/{{SECRET1}}?version=1",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Accept-Encoding",
+                    "value": "base64",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": [
+                  {
+                    "name": "version",
+                    "value": "1",
+                    "enabled": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "Group",
+          "items": [
+            {
+              "type": "http",
+              "name": "List Role Members",
+              "seq": 1,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/group/gitlab-apps?members",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "test(\"The response body contains the requested role members.\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+                "query": [
+                  {
+                    "name": "members",
+                    "value": "",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "List a role's memberships",
+              "seq": 2,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/group/gitlab-apps?memberships",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "test(\"The response body contains the requested role members.\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+                "query": [
+                  {
+                    "name": "memberships",
+                    "value": "",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "Show permitted roles",
+              "seq": 3,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}/group/gitlab-apps?permitted_roles=true&privilege=execute",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "test(\"The response body contains the requested role members.\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+                "query": [
+                  {
+                    "name": "permitted_roles",
+                    "value": "true",
+                    "enabled": true
+                  },
+                  {
+                    "name": "privilege",
+                    "value": "execute",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "Show a role",
+              "seq": 4,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/group/gitlab-apps",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Accept-Encoding",
+                    "value": "base64",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            },
+            {
+              "type": "http",
+              "name": "Search",
+              "seq": 5,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}?kind=group&search=dev",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": [
+                  {
+                    "name": "kind",
+                    "value": "group",
+                    "enabled": true
+                  },
+                  {
+                    "name": "search",
+                    "value": "dev",
+                    "enabled": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "User",
+          "items": [
+            {
+              "type": "http",
+              "name": "List a role's memberships",
+              "seq": 2,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/user/aslan?memberships",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "test(\"The response body contains the requested role members.\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+                "query": [
+                  {
+                    "name": "memberships",
+                    "value": "",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "List Role Members",
+              "seq": 1,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/user/aslan?members",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "test(\"The response body contains the requested role members.\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+                "query": [
+                  {
+                    "name": "members",
+                    "value": "",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "Show a role",
+              "seq": 3,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/user/aslan",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Accept-Encoding",
+                    "value": "base64",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            },
+            {
+              "type": "http",
+              "name": "Search",
+              "seq": 4,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}?kind=user&search=aslan",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": [
+                  {
+                    "name": "kind",
+                    "value": "user",
+                    "enabled": true
+                  },
+                  {
+                    "name": "search",
+                    "value": "aslan",
+                    "enabled": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "Hosts",
+          "items": [
+            {
+              "type": "http",
+              "name": "List a role's memberships",
+              "seq": 2,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/host/apps/gitlab-projects/aslan_carlos?memberships",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "test(\"The response body contains the requested role members.\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+                "query": [
+                  {
+                    "name": "memberships",
+                    "value": "",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "List Role Members",
+              "seq": 1,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/host/apps/gitlab-projects/aslan_carlos?members",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "test(\"The response body contains the requested role members.\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+                "query": [
+                  {
+                    "name": "members",
+                    "value": "",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "Show permitted roles",
+              "seq": 3,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}/host/apps/gitlab-projects/aslan_carlos?permitted_roles=true&privilege=execute",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "test(\"The response body contains the requested role members.\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+                "query": [
+                  {
+                    "name": "permitted_roles",
+                    "value": "true",
+                    "enabled": true
+                  },
+                  {
+                    "name": "privilege",
+                    "value": "execute",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "Show a role",
+              "seq": 4,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/host/apps/gitlab-projects/aslan_carlos",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Accept-Encoding",
+                    "value": "base64",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            },
+            {
+              "type": "http",
+              "name": "Search",
+              "seq": 5,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}?kind=host&search=k8s-demo-sidecar",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": [
+                  {
+                    "name": "kind",
+                    "value": "host",
+                    "enabled": true
+                  },
+                  {
+                    "name": "search",
+                    "value": "k8s-demo-sidecar",
+                    "enabled": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "http",
+          "name": "Show a Resource",
+          "seq": 3,
+          "request": {
+            "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}/policy/conjur/authn-jwt/gitlab1",
+            "method": "GET",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": "Token token=\"{{TOKEN}}\"",
+                "enabled": true
+              },
+              {
+                "name": "Accept-Encoding",
+                "value": "base64",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "folder",
+          "name": "Policy",
+          "items": [
+            {
+              "type": "http",
+              "name": "List a role's memberships",
+              "seq": 2,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/policy/conjur/authn-jwt/gitlab1?memberships",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "test(\"The response body contains the requested role members.\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+                "query": [
+                  {
+                    "name": "memberships",
+                    "value": "",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "List Role Members",
+              "seq": 1,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/policy/conjur/authn-jwt/gitlab1?members",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "test(\"The response body contains the requested role members.\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+                "query": [
+                  {
+                    "name": "members",
+                    "value": "",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "Show permitted roles",
+              "seq": 3,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}/policy/conjur/authn-jwt/gitlab1?permitted_roles=true&privilege=execute'",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "test(\"The response body contains the requested role members.\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});",
+                "query": [
+                  {
+                    "name": "permitted_roles",
+                    "value": "true",
+                    "enabled": true
+                  },
+                  {
+                    "name": "privilege",
+                    "value": "execute'",
+                    "enabled": true
+                  }
+                ]
+              }
+            },
+            {
+              "type": "http",
+              "name": "Show a role",
+              "seq": 4,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/roles/{{ACCOUNT}}/policy/conjur/authn-jwt/gitlab1",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  },
+                  {
+                    "name": "Accept-Encoding",
+                    "value": "base64",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            },
+            {
+              "type": "http",
+              "name": "Search",
+              "seq": 5,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}?kind=policy&search=gitlab",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Authorization",
+                    "value": "Token token=\"{{TOKEN}}\"",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": [
+                  {
+                    "name": "kind",
+                    "value": "policy",
+                    "enabled": true
+                  },
+                  {
+                    "name": "search",
+                    "value": "gitlab",
+                    "enabled": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "Observability",
+          "items": [
+            {
+              "type": "http",
+              "name": "Health",
+              "seq": 1,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/health",
+                "method": "GET",
+                "headers": [],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            },
+            {
+              "type": "http",
+              "name": "Info",
+              "seq": 2,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/info",
+                "method": "GET",
+                "headers": [],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            },
+            {
+              "type": "http",
+              "name": "Usage",
+              "seq": 3,
+              "request": {
+                "url": "https://{{CONJUR_URL}}/usage",
+                "method": "GET",
+                "headers": [],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "auth": {
+                  "mode": "none",
+                  "basic": {
+                    "username": "",
+                    "password": ""
+                  },
+                  "bearer": {
+                    "token": ""
+                  }
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "query": []
+              }
+            }
+          ]
+        },
+        {
+          "type": "http",
+          "name": "List All Resources",
+          "seq": 2,
+          "request": {
+            "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}",
+            "method": "GET",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": "Token token=\"{{TOKEN}}\"",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "Search",
+          "seq": 1,
+          "request": {
+            "url": "https://{{CONJUR_URL}}/resources/{{ACCOUNT}}?search=aslan",
+            "method": "GET",
+            "headers": [
+              {
+                "name": "Accept-Encoding",
+                "value": "base64",
+                "enabled": true
+              },
+              {
+                "name": "Authorization",
+                "value": "Token token=\"{{TOKEN}}\"",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "query": [
+              {
+                "name": "search",
+                "value": "aslan",
+                "enabled": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Policy",
+      "items": [
+        {
+          "type": "http",
+          "name": "Replace",
+          "seq": 1,
+          "request": {
+            "url": "https://{{CONJUR_URL}}/policies/{{ACCOUNT}}/policy/root",
+            "method": "PUT",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": "Token token=\"{{TOKEN}}\"",
+                "enabled": true
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "text",
+              "text": "- !policy\n  id: database\n  body:\n    - !host\n      id: db-host\n    - !variable\n      id: db-password\n      owner: !host db-host",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "Load",
+          "seq": 2,
+          "request": {
+            "url": "https://{{CONJUR_URL}}/api/policies/{{ACCOUNT}}/policy/root",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": "Token token=\"{{TOKEN}}\"",
+                "enabled": true
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "text",
+              "json": "- !policy\n  id: database\n  body:\n    - !host\n      id: new-host\n    - !variable\n      id: new-variable\n      owner: !host new-host",
+              "text": "- !policy\n  id: database\n  body:\n    - !host\n      id: new-host\n    - !variable\n      id: new-variable\n      owner: !host new-host",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"The policy was extended successfully\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(201);\n});",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "Update",
+          "seq": 3,
+          "request": {
+            "url": "https://{{CONJUR_URL}}/api/policies/{{ACCOUNT}}/policy/root",
+            "method": "PATCH",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": "Token token=\"{{TOKEN}}\"",
+                "enabled": true
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "text",
+              "json": "- !policy\n  id: database\n  body:\n    - !host\n      id: new-host\n    - !variable\n      id: new-variable\n      owner: !host new-host",
+              "text": "- !policy\n  id: database\n  body:\n    - !host\n      id: new-host\n    - !variable\n      id: new-variable\n      owner: !host new-host",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"The policy was extended successfully\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(201);\n});",
+            "query": []
+          }
+        }
+      ]
+    }
+  ],
+  "activeEnvironmentUid": "2n4yzf3X992Q1cq0wd18z",
+  "environments": [
+    {
+      "variables": [
+        {
+          "name": "ACCOUNT",
+          "value": "<<CONJURACOUNT>>",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "CONJUR_URL",
+          "value": "https://yourconjur.domain",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "TOKEN",
+          "value": "xxxxx",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "APIKEY",
+          "value": "xxxxxx",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "SECRET1",
+          "value": "secrets/db01/username",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "SECRET2",
+          "value": "secrets/db01/password",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "ADMIN",
+          "value": "admin",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "PASSWORD",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        }
+      ],
+      "name": "Self Hosted"
+    }
+  ]
+}
