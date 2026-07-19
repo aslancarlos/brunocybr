@@ -1,0 +1,40 @@
+meta {
+  name: Get platform token (service user / IAM)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{identityUrl}}/oauth2/platformtoken
+  body: text
+  auth: none
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:text {
+  grant_type=client_credentials&client_id={{pcloudServiceUser}}&client_secret={{pcloudServiceSecret}}
+}
+
+script:post-response {
+  const b = res.getBody();
+  if (res.getStatus() === 200 && b && b.access_token) {
+    bru.setEnvVar("pcloudToken", b.access_token);
+  }
+}
+
+tests {
+  test("got platform token", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("access_token");
+  });
+}
+
+docs {
+  Autentica o usuário de serviço (IAM) do CyberArk Identity via OAuth2 client_credentials
+  (ISPSS platform token). Guarda o bearer em {{pcloudToken}}.
+  É o mesmo fluxo usado pelo cybr-cli (-a identity) e psPAS para o Privilege Cloud.
+  Endpoint: POST https://<subdomain>.id.cyberark.cloud/oauth2/platformtoken
+}

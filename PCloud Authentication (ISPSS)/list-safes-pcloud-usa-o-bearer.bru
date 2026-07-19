@@ -1,0 +1,25 @@
+meta {
+  name: List Safes (PCloud) — usa o bearer
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{pcloudUrl}}/PasswordVault/API/Safes
+  body: none
+  auth: none
+}
+
+params:query {
+  ~search: my-safe
+  ~limit: 50
+}
+
+headers {
+  Authorization: Bearer {{pcloudToken}}
+}
+
+docs {
+  Exemplo de chamada ao Privilege Cloud usando o platform token no header Authorization: Bearer.
+  Comprova que o usuário IAM autenticou. Ajuste o path para outras APIs do PasswordVault.
+}

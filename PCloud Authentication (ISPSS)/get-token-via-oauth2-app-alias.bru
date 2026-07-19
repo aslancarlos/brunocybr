@@ -1,0 +1,35 @@
+meta {
+  name: Get token via OAuth2 app (alias)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{identityUrl}}/oauth2/token/{{pcloudAppAlias}}
+  body: text
+  auth: none
+}
+
+params:path {
+  pcloudAppAlias: {{pcloudAppAlias}}
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:text {
+  grant_type=client_credentials&client_id={{pcloudServiceUser}}&client_secret={{pcloudServiceSecret}}
+}
+
+script:post-response {
+  const b = res.getBody();
+  if (res.getStatus() === 200 && b && b.access_token) {
+    bru.setEnvVar("pcloudToken", b.access_token);
+  }
+}
+
+docs {
+  Variante: obtém o token por um OAuth2 Client customizado (app alias) no CyberArk Identity.
+  Endpoint: POST https://<subdomain>.id.cyberark.cloud/oauth2/token/<app-alias>
+}

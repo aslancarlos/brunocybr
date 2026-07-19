@@ -1,0 +1,39 @@
+meta {
+  name: Exchange platform token -> Conjur (authn-oidc)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/authn-oidc/{{oidcServiceId}}/{{account}}/authenticate
+  body: text
+  auth: none
+}
+
+params:path {
+  oidcServiceId: {{oidcServiceId}}
+  account: {{account}}
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+  Accept-Encoding: base64
+}
+
+body:text {
+  id_token={{identityToken}}
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 200 && body) {
+    // token base64 (Accept-Encoding: base64) — pronto para o header Authorization
+    bru.setEnvVar("accessToken", typeof body === "string" ? body : JSON.stringify(body));
+  }
+}
+
+docs {
+  Ponte PCloud/Identity -> Secrets Manager SaaS: usa o id_token do CyberArk Identity para
+  obter um access token do Conjur Cloud (authn-oidc, service_id 'cyberark').
+  Obs.: o authn-oidc espera o id_token; o platform token acima é o access_token do OAuth2.
+}

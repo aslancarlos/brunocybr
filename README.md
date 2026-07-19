@@ -11,12 +11,12 @@ host factory, certificate authority e as APIs **v2** de workloads/safes/autentic
 Bruno é um cliente HTTP open-source, baseado em arquivos (alternativa ao Postman), que
 guarda a collection em texto plano (`.bru`) — versionável e diffável no git.
 
-## Conteúdo (46 requests em 10 pastas)
+## Conteúdo (50 requests em 11 pastas)
 
 | Pasta | Requests |
 |---|---|
 | **Health and Status** | health, info, whoami, list authenticators, authenticator status (service/GCP), remote health |
-| **Authentication** | login (API key), authenticate (access token), rotate API key, change password, authn-jwt / authn-iam / authn-azure / authn-gcp / authn-oidc (CyberArk Identity) / authn-k8s / authn-ldap, enable/disable authenticator |
+| **Authentication** | login (API key), authenticate (access token), rotate API key, change password, authn-jwt / **authn-iam (AWS)** / authn-azure / authn-gcp / authn-oidc (CyberArk Identity) / authn-k8s / authn-ldap, enable/disable authenticator |
 | **Secrets** | retrieve secret, set secret value, batch retrieve |
 | **Policies** | append (POST), replace (PUT), update (PATCH) |
 | **Resources** | list (global / por account / por kind), show resource |
@@ -25,6 +25,17 @@ guarda a collection em texto plano (`.bru`) — versionável e diffável no git.
 | **Public Keys** | show public keys |
 | **Certificate Authority** | sign certificate (CSR) |
 | **SaaS v2 APIs** | batch retrieve (até 250), add group member, update authenticator, create/delete workload |
+| **PCloud Authentication (ISPSS)** | get platform token (service user / IAM), token via OAuth2 app alias, List Safes (uso do bearer), exchange platform token → Conjur (authn-oidc) |
+
+### Autenticação como "usuário IAM"
+
+- **AWS IAM** (workload): `Authentication → authn-iam` — troca os headers assinados de um
+  `STS GetCallerIdentity` por um access token do Conjur.
+- **Usuário de serviço / IAM do PCloud** (CyberArk Identity / ISPSS): `PCloud Authentication
+  (ISPSS) → Get platform token` — OAuth2 `client_credentials` no
+  `https://<subdomain>.id.cyberark.cloud/oauth2/platformtoken`, retornando o bearer usado
+  nas APIs do Privilege Cloud (mesmo fluxo do `cybr-cli -a identity` / psPAS). O request
+  de exchange mostra como levar essa identidade ao Conjur Cloud via `authn-oidc`.
 
 Base v1 gerada a partir do [OpenAPI oficial do Conjur](https://github.com/cyberark/conjur-openapi-spec);
 adições v2 conforme a [documentação Secrets Manager SaaS](https://docs.cyberark.com/secrets-manager-saas/latest/en/content/developer/lp_rest_api.htm).
@@ -65,6 +76,11 @@ Todos os valores são **exemplos genéricos**; troque pelos do seu ambiente.
 | `workloadName` / `safeName` | `my-app` / `my-safe` | usados nas APIs v2 |
 | `roleKind` / `roleId` / `memberId` | `user` / `alice` / `my-safe:host:my-app` | roles e membership |
 | `hostFactoryToken` / `remote` | *(exemplos)* | host factory / follower |
+| `identityUrl` | `https://example-tenant.id.cyberark.cloud` | tenant do CyberArk Identity (ISPSS) |
+| `pcloudUrl` | `https://example-tenant.privilegecloud.cyberark.cloud` | tenant do Privilege Cloud |
+| `pcloudServiceUser` / `pcloudServiceSecret` | `svc-conjur-api@example-tenant` / *(exemplo)* | usuário IAM/serviço + segredo (client_credentials) |
+| `pcloudAppAlias` | `__idaptive_cybr_user_oidc` | app alias do OAuth2 client (variante) |
+| `pcloudToken` | *(preenchido pelo Get platform token)* | bearer para as APIs do PCloud |
 
 ## Notas importantes
 
