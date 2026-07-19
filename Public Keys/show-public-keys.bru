@@ -1,0 +1,27 @@
+meta {
+  name: Show public keys
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/public_keys/{{account}}/{{resourceKind}}/{{roleId}}
+  body: none
+  auth: none
+}
+
+params:path {
+  account: {{account}}
+  resourceKind: user
+  roleId: {{roleId}}
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Mostra as chaves públicas de um recurso (ex.: SSH). Não requer autenticação.
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Revoke host factory token
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/host_factory_tokens/{{hostFactoryToken}}
+  body: none
+  auth: none
+}
+
+params:path {
+  hostFactoryToken: {{hostFactoryToken}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Revoga (desabilita imediatamente) um host factory token.
+}

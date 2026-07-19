@@ -1,0 +1,21 @@
+meta {
+  name: Health
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/health
+  body: none
+  auth: none
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Health info sobre o Secrets Manager. Não requer autenticação.
+}

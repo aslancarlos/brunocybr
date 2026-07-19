@@ -1,0 +1,41 @@
+meta {
+  name: Append policy (POST)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/policies/{{account}}/policy/{{policyId}}
+  body: text
+  auth: none
+}
+
+params:path {
+  account: {{account}}
+  policyId: {{policyId}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+  Content-Type: application/x-yaml
+}
+
+body:text {
+  - !variable
+      id: dbuser_dual/password
+  - !host my-app
+  - !permit
+      role: !host my-app
+      privileges: [ read, execute ]
+      resource: !variable dbuser_dual/password
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Adiciona dados à policy existente (não remove nada). Corpo = policy YAML.
+}

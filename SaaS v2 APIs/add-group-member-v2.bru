@@ -1,0 +1,35 @@
+meta {
+  name: Add group member (v2)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/groups/{{account}}/{{authnType}}/{{authnName}}/apps/members
+  body: json
+  auth: none
+}
+
+params:path {
+  account: {{account}}
+  authnType: {{authnType}}
+  authnName: {{authnName}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+  Accept: application/x.secretsmgr.v2+json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "id": "{{workloadName}}",
+    "kind": "host"
+  }
+}
+
+docs {
+  APIv2: adiciona um workload ao apps group de um autenticador (dá permissão de authenticate).
+  Ex.: POST /api/groups/conjur/authn-iam/default/apps/members.
+}

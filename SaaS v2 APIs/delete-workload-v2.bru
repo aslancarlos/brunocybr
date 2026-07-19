@@ -1,0 +1,24 @@
+meta {
+  name: Delete workload (v2)
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/workloads/{{workloadName}}
+  body: none
+  auth: none
+}
+
+params:path {
+  workloadName: {{workloadName}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+  Accept: application/x.secretsmgr.v2+json
+}
+
+docs {
+  APIv2: remove um workload.
+}

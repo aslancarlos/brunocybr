@@ -1,0 +1,33 @@
+meta {
+  name: Rotate API key
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/authn/{{account}}/api_key
+  body: none
+  auth: none
+}
+
+params:path {
+  account: {{account}}
+}
+
+params:query {
+  role: {{roleId}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Rotaciona a API key de um role. O corpo da resposta é a nova API key.
+}

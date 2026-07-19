@@ -1,0 +1,36 @@
+meta {
+  name: Remove role membership
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/roles/{{account}}/{{roleKind}}/{{roleId}}
+  body: none
+  auth: none
+}
+
+params:path {
+  account: {{account}}
+  roleKind: {{roleKind}}
+  roleId: {{roleId}}
+}
+
+params:query {
+  action: revoke
+  member: {{memberId}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Revoga a associação de um membro (action=revoke).
+}

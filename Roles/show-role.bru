@@ -1,0 +1,35 @@
+meta {
+  name: Show role
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/roles/{{account}}/{{roleKind}}/{{roleId}}
+  body: none
+  auth: none
+}
+
+params:path {
+  account: {{account}}
+  roleKind: {{roleKind}}
+  roleId: {{roleId}}
+}
+
+params:query {
+  ~members: true
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Informações de um role (kind: user, host, group, layer, policy).
+}

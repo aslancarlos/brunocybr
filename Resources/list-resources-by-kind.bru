@@ -1,0 +1,30 @@
+meta {
+  name: List resources by kind
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/resources/{{account}}/{{resourceKind}}
+  body: none
+  auth: none
+}
+
+params:path {
+  account: {{account}}
+  resourceKind: {{resourceKind}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Lista recursos de um mesmo kind (variable, host, user, group, policy, webservice).
+}

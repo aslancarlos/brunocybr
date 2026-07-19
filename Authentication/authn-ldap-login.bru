@@ -1,0 +1,38 @@
+meta {
+  name: authn-ldap login
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{baseUrl}}/authn-ldap/{{serviceId}}/{{account}}/login
+  body: none
+  auth: basic
+}
+
+params:path {
+  serviceId: {{serviceId}}
+  account: {{account}}
+}
+
+auth:basic {
+  username: {{login}}
+  password: {{password}}
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 200 && body) {
+    bru.setEnvVar("apiKey", typeof body === "string" ? body : String(body));
+  }
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Obtém a API key via LDAP.
+}

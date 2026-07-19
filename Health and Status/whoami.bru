@@ -1,0 +1,25 @@
+meta {
+  name: WhoAmI
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/whoami
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Informações sobre o cliente que faz a chamada (IP, account, role, token). Requer access token.
+}

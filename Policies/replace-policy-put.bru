@@ -1,0 +1,39 @@
+meta {
+  name: Replace policy (PUT)
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/policies/{{account}}/policy/{{policyId}}
+  body: text
+  auth: none
+}
+
+params:path {
+  account: {{account}}
+  policyId: {{policyId}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+  Content-Type: application/x-yaml
+}
+
+body:text {
+  - !policy
+      id: my-safe
+      body:
+      - !variable dbuser_dual/password
+      - !host my-app
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Carrega/substitui a policy (remove o que não estiver declarado no branch). Use com cuidado.
+}

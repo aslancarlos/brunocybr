@@ -1,0 +1,30 @@
+vars {
+  baseUrl: https://example-tenant.secretsmgr.cyberark.cloud/api
+  account: conjur
+  login: admin
+  password: ChangeMe-Example-Passw0rd
+  newPassword: ChangeMe-Example-Passw0rd-2
+  apiKey: run-LOGIN-to-populate
+  accessToken: run-AUTHENTICATE-to-populate
+  roleId: alice
+  roleKind: user
+  memberId: my-safe:host:my-app
+  resourceKind: variable
+  variableKind: variable
+  variableId: data%2Fvault%2Fmy-safe%2Fdbuser_dual%2Fpassword
+  policyId: data/vault/my-safe
+  serviceId: my-jwt-authenticator
+  oidcServiceId: cyberark
+  authenticator: authn-jwt
+  workloadId: host%2Fdata%2Fvault%2Fmy-safe%2Fmy-app
+  jwt: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6Y29uanVyOm15LWFwcCIsImF1ZCI6ImNvbmp1ciJ9.EXAMPLE-signature
+  identityToken: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.EXAMPLE-cyberark-identity-id-token
+  azureAccessToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.EXAMPLE-azure-managed-identity-token
+  gcpIdentityToken: eyJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ.EXAMPLE-gcp-instance-identity-token
+  hostFactoryToken: 2n9z6k1tEXAMPLEhostfactorytoken
+  remote: conjur-follower.example.com
+  authnType: authn-iam
+  authnName: default
+  workloadName: my-app
+  safeName: my-safe
+}

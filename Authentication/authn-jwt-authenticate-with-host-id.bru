@@ -1,0 +1,44 @@
+meta {
+  name: authn-jwt authenticate (with host id)
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/authn-jwt/{{serviceId}}/{{account}}/{{workloadId}}/authenticate
+  body: text
+  auth: none
+}
+
+params:path {
+  serviceId: {{serviceId}}
+  account: {{account}}
+  workloadId: {{workloadId}}
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+  Accept-Encoding: base64
+}
+
+body:text {
+  jwt={{jwt}}
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 200 && body) {
+    // token base64 (Accept-Encoding: base64) — pronto para o header Authorization
+    bru.setEnvVar("accessToken", typeof body === "string" ? body : JSON.stringify(body));
+  }
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Igual ao anterior, mas com o host id explícito na URL (quando o mapeamento não vem de um claim).
+}

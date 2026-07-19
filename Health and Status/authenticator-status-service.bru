@@ -1,0 +1,31 @@
+meta {
+  name: Authenticator status (service)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/{{authenticator}}/{{serviceId}}/{{account}}/status
+  body: none
+  auth: none
+}
+
+params:path {
+  authenticator: {{authenticator}}
+  serviceId: {{serviceId}}
+  account: {{account}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Diz se um serviço de autenticação (ex.: authn-jwt/serviceId) está configurado corretamente.
+}

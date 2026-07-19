@@ -1,0 +1,35 @@
+meta {
+  name: Sign certificate
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/ca/{{account}}/{{serviceId}}/sign
+  body: text
+  auth: none
+}
+
+params:path {
+  account: {{account}}
+  serviceId: {{serviceId}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:text {
+  csr=-----BEGIN CERTIFICATE REQUEST-----%0A...%0A-----END CERTIFICATE REQUEST-----&ttl=PT1H
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Assina um CSR usando a CA configurada (Kubernetes CA service, por exemplo).
+}

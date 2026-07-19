@@ -1,0 +1,32 @@
+meta {
+  name: List resources
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/resources
+  body: none
+  auth: none
+}
+
+params:query {
+  ~kind: variable
+  ~search: dbuser
+  ~limit: 50
+  ~offset: 0
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Lista recursos que o token pode ver. Filtros opcionais: kind, search, limit, offset.
+}

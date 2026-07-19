@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "CyberArk Secrets Manager SaaS",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

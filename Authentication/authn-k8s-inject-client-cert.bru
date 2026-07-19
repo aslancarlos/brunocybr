@@ -1,0 +1,33 @@
+meta {
+  name: authn-k8s inject client cert
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/authn-k8s/{{serviceId}}/inject_client_cert
+  body: text
+  auth: none
+}
+
+params:path {
+  serviceId: {{serviceId}}
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:text {
+
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Passo do handshake authn-k8s: injeta o certificado de cliente no pod.
+}

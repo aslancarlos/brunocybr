@@ -1,0 +1,35 @@
+meta {
+  name: Enable/disable authenticator
+  type: http
+  seq: 15
+}
+
+patch {
+  url: {{baseUrl}}/{{authenticator}}/{{account}}
+  body: text
+  auth: none
+}
+
+params:path {
+  authenticator: {{authenticator}}
+  account: {{account}}
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+  Authorization: Token token="{{accessToken}}"
+}
+
+body:text {
+  enabled=true
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Habilita/desabilita um autenticador sem service_id.
+}

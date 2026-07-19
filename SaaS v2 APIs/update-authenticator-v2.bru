@@ -1,0 +1,32 @@
+meta {
+  name: Update authenticator (v2)
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/authenticators/{{authnType}}/{{authnName}}
+  body: json
+  auth: none
+}
+
+params:path {
+  authnType: {{authnType}}
+  authnName: {{authnName}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+  Accept: application/x.secretsmgr.v2+json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "enabled": true
+  }
+}
+
+docs {
+  APIv2: atualiza um autenticador (PATCH /api/authenticators/<type>/<name>).
+}

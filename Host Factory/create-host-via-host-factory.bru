@@ -1,0 +1,30 @@
+meta {
+  name: Create host (via host factory)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/host_factories/hosts
+  body: text
+  auth: none
+}
+
+headers {
+  Authorization: Token token="{{hostFactoryToken}}"
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:text {
+  id=my-new-host
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Cria um host usando um host factory token (Authorization: Token token=<hostFactoryToken>).
+}

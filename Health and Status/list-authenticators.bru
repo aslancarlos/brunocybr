@@ -1,0 +1,21 @@
+meta {
+  name: List authenticators
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/authenticators
+  body: none
+  auth: none
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Lista quais autenticadores estão instalados, habilitados e configurados.
+}

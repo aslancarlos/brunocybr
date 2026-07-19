@@ -1,0 +1,30 @@
+meta {
+  name: Create workload (v2)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/workloads
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+  Accept: application/x.secretsmgr.v2+json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "{{workloadName}}",
+    "authn_type": "{{authnType}}",
+    "safes": [ "{{safeName}}" ]
+  }
+}
+
+docs {
+  APIv2: cria um workload (identidade não-humana) e o associa a um safe/autenticador.
+  Confirme o schema exato na doc REST APIs v2 (pode variar por versão do tenant).
+}

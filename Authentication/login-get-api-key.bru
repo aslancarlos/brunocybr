@@ -1,0 +1,38 @@
+meta {
+  name: LOGIN (get API key)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/authn/{{account}}/login
+  body: none
+  auth: basic
+}
+
+params:path {
+  account: {{account}}
+}
+
+auth:basic {
+  username: {{login}}
+  password: {{password}}
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 200 && body) {
+    bru.setEnvVar("apiKey", typeof body === "string" ? body : String(body));
+  }
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Troca usuário+senha (Basic Auth) pela API key do role. Guarda em {{apiKey}}.
+  Execute PRIMEIRO se for autenticar por API key.
+}

@@ -1,0 +1,50 @@
+meta {
+  name: authn-iam authenticate
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/authn-iam/{{serviceId}}/{{account}}/{{workloadId}}/authenticate
+  body: json
+  auth: none
+}
+
+params:path {
+  serviceId: {{serviceId}}
+  account: {{account}}
+  workloadId: {{workloadId}}
+}
+
+headers {
+  Content-Type: application/json
+  Accept-Encoding: base64
+}
+
+body:json {
+  {
+    "Authorization": "AWS4-HMAC-SHA256 ...",
+    "Host": "sts.amazonaws.com",
+    "X-Amz-Date": "20260101T000000Z",
+    "X-Amz-Security-Token": "..."
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 200 && body) {
+    // token base64 (Accept-Encoding: base64) — pronto para o header Authorization
+    bru.setEnvVar("accessToken", typeof body === "string" ? body : JSON.stringify(body));
+  }
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Autentica um workload AWS (authn-iam). Corpo = headers assinados de uma chamada STS GetCallerIdentity.
+  O host id é <AccountID>/<RoleName>.
+}

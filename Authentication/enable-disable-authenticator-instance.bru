@@ -1,0 +1,36 @@
+meta {
+  name: Enable/disable authenticator instance
+  type: http
+  seq: 16
+}
+
+patch {
+  url: {{baseUrl}}/{{authenticator}}/{{serviceId}}/{{account}}
+  body: text
+  auth: none
+}
+
+params:path {
+  authenticator: {{authenticator}}
+  serviceId: {{serviceId}}
+  account: {{account}}
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+  Authorization: Token token="{{accessToken}}"
+}
+
+body:text {
+  enabled=true
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Habilita/desabilita uma instância de autenticador (com service_id).
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Authenticator status (GCP)
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/authn-gcp/{{account}}/status
+  body: none
+  auth: none
+}
+
+params:path {
+  account: {{account}}
+}
+
+headers {
+  Authorization: Token token="{{accessToken}}"
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Status do autenticador GCP (não usa service_id).
+}

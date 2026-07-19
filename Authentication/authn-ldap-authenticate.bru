@@ -1,0 +1,43 @@
+meta {
+  name: authn-ldap authenticate
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{baseUrl}}/authn-ldap/{{serviceId}}/{{account}}/{{login}}/authenticate
+  body: text
+  auth: none
+}
+
+params:path {
+  serviceId: {{serviceId}}
+  account: {{account}}
+  login: {{login}}
+}
+
+headers {
+  Accept-Encoding: base64
+}
+
+body:text {
+  {{password}}
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 200 && body) {
+    // token base64 (Accept-Encoding: base64) — pronto para o header Authorization
+    bru.setEnvVar("accessToken", typeof body === "string" ? body : JSON.stringify(body));
+  }
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Access token via LDAP.
+}

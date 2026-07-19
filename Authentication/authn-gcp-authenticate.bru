@@ -1,0 +1,42 @@
+meta {
+  name: authn-gcp authenticate
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/authn-gcp/{{account}}/authenticate
+  body: text
+  auth: none
+}
+
+params:path {
+  account: {{account}}
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+  Accept-Encoding: base64
+}
+
+body:text {
+  jwt={{gcpIdentityToken}}
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 200 && body) {
+    // token base64 (Accept-Encoding: base64) — pronto para o header Authorization
+    bru.setEnvVar("accessToken", typeof body === "string" ? body : JSON.stringify(body));
+  }
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Autentica um workload GCP usando o identity token da instância (não usa service_id).
+}

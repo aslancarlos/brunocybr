@@ -1,0 +1,25 @@
+meta {
+  name: Remote health
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/remote_health/{{remote}}
+  body: none
+  auth: none
+}
+
+params:path {
+  remote: {{remote}}
+}
+
+tests {
+  test("status is 2xx", function() {
+    expect(res.getStatus()).to.be.within(200, 299);
+  });
+}
+
+docs {
+  Health de um follower/servidor remoto (Conjur Enterprise). Pode não se aplicar ao SaaS.
+}
