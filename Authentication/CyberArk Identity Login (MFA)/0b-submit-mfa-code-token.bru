@@ -1,7 +1,7 @@
 meta {
-  name: 3c. Advance - poll (push notification)
+  name: 0b. Submit MFA code -> token
   type: http
-  seq: 7
+  seq: 2
 }
 
 post {
@@ -19,7 +19,8 @@ body:json {
   {
     "SessionId": "{{idSessionId}}",
     "MechanismId": "{{idMechMfa}}",
-    "Action": "Poll"
+    "Action": "Answer",
+    "Answer": "{{idOtp}}"
   }
 }
 
@@ -43,7 +44,14 @@ script:post-response {
   }
 }
 
+tests {
+  test("login success", function() {
+    const r = res.getBody().Result || {};
+    expect(r.Summary).to.equal("LoginSuccess");
+  });
+}
+
 docs {
-  Para MFA por PUSH (mobile): rode repetidamente até Summary=LoginSuccess (aprove no celular).
-  Em sucesso, grava identityBearer.
+  Passo final do fluxo encadeado: cole o codigo (do e-mail ou do app OATH) em idOtp e rode.
+  Em LoginSuccess grava identityBearer. Use logo apos o '0a'.
 }

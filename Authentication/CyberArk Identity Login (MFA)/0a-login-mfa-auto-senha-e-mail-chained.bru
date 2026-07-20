@@ -1,0 +1,82 @@
+meta {
+  name: 0a. Login MFA (auto: senha + e-mail) [chained]
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{identityUrl}}/Security/StartAuthentication
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-IDAP-NATIVE-CLIENT: true
+}
+
+body:json {
+  {
+    "User": "{{idUser}}",
+    "Version": "1.0"
+  }
+}
+
+script:post-response {
+  const base = bru.getEnvVar("identityUrl");
+  const axios = require("axios");
+  const H = { headers: { "Content-Type": "application/json", "X-IDAP-NATIVE-CLIENT": "true" } };
+  let r = (res.getBody() && res.getBody().Result) || {};
+  if (r.PodFqdn) { bru.setEnvVar("identityUrl", "https://" + r.PodFqdn); console.log("PodFqdn: identityUrl ajustado para https://" + r.PodFqdn + " -> rode este request de novo."); return; }
+  const sid = r.SessionId;
+  bru.setEnvVar("idSessionId", sid);
+  bru.setEnvVar("idTenantId", r.TenantId || "");
+  let up = null, m1 = {};
+  (r.Challenges || []).forEach(function(c){ (c.Mechanisms||[]).forEach(function(m){ if (m.Name === "UP") up = m.MechanismId; else m1[m.Name] = m.MechanismId; }); });
+  if (!up) { console.log("Sem desafio de senha (UP)."); return; }
+  try {
+    const pw = bru.getEnvVar("idPassword");
+    const a = await axios.post(base + "/Security/AdvanceAuthentication", { TenantId: r.TenantId, SessionId: sid, MechanismId: up, Action: "Answer", Answer: pw }, H);
+    const ar = (a.data && a.data.Result) || {};
+    console.log("Apos senha -> Summary:", ar.Summary);
+    if (a.data && a.data.success === false) { console.log("FALHA na senha:", a.data.Message); return; }
+    if (ar.Summary === "LoginSuccess" && ar.Token) { bru.setEnvVar("identityBearer", ar.Token); console.log("LoginSuccess (MFA em cache) -> identityBearer gravado. Pule o Submit code."); return; }
+    let m2 = {};
+    (ar.Challenges || []).forEach(function(c){ (c.Mechanisms||[]).forEach(function(m){ m2[m.Name] = m.MechanismId; }); });
+    if (m2.EMAIL) bru.setEnvVar("idMechEmail", m2.EMAIL);
+    if (m2.OATH) bru.setEnvVar("idMechOath", m2.OATH);
+    if (m2.SMS) bru.setEnvVar("idMechSms", m2.SMS);
+    const emailId = m2.EMAIL || m1.EMAIL;
+    const chosen = emailId || m2.OATH || m1.OATH || m2.SMS || m1.SMS;
+    bru.setEnvVar("idMechMfa", chosen || "");
+    if (!chosen) { console.log("Sem 2o fator no retorno (Summary:", ar.Summary + "). Se a senha estiver correta pode nao exigir MFA; caso contrario verifique idPassword."); return; }
+    if (emailId) {
+      const s = await axios.post(base + "/Security/AdvanceAuthentication", { SessionId: sid, MechanismId: emailId, Action: "StartOTP" }, H);
+      const sr = (s.data && s.data.Result) || {};
+      if (s.data && s.data.success !== false && sr.Summary !== "Undefined") {
+        console.log("E-mail ENVIADO (Summary:", sr.Summary + "). Verifique o e-mail e rode '0b. Submit MFA code' com idOtp.");
+      } else {
+        console.log("StartOTP (e-mail) FALHOU:", (s.data && s.data.Message) || sr.Summary, "-> provavel senha incorreta (idPassword) ou sessao invalida.");
+      }
+    } else {
+      console.log("Sem e-mail; use OATH/TOTP no '0b. Submit MFA code' (idMechMfa =", chosen + ").");
+    }
+  } catch (e) {
+    console.log("Erro no encadeamento:", (e && e.message) ? e.message : String(e));
+  }
+}
+
+tests {
+  test("started", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+docs {
+  FLUXO ENCADEADO (recomendado). Preencha idUser e idPassword e rode ESTE request.
+  Ele faz tudo numa sessao so: StartAuthentication -> responde a senha -> dispara o
+  codigo por E-MAIL (via axios). Assim nao ha problema de ordem nem de MechanismId.
+  Se a senha bastar (MFA em cache), ja grava identityBearer. Senao, ENVIA o e-mail —
+  veja o console e rode '0b. Submit MFA code' com o codigo. Requer identityUrl no PodFqdn
+  (se vier PodFqdn no console, rode de novo).
+}
