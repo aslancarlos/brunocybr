@@ -24,6 +24,7 @@ body:json {
 }
 
 docs {
-  Dispara o envio do código MFA. Por PADRÃO idMechMfa = E-MAIL, então isto envia o código
-  por e-mail. Depois rode o 3b com o código. PULE este passo se usar app autenticador (OATH/TOTP).
+  ⚠️ PRÉ-REQUISITO: rode o 2 (senha) ANTES — senão dá 'challenge has failed' (o e-mail é 2º fator).
+  Dispara o envio do código por E-MAIL (idMechMfa = e-mail por padrão). Depois rode o 3b com o código.
+  PULE este passo se usar app autenticador (OATH/TOTP) — nesse caso vá direto ao 3b.
 }

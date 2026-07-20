@@ -31,7 +31,16 @@ script:post-response {
     bru.setEnvVar("identityBearer", r.Token);
     console.log("LoginSuccess -> identityBearer gravado.");
   } else {
-    (r.Challenges || []).forEach(function(c){ (c.Mechanisms||[]).forEach(function(m){ bru.setEnvVar("idMechMfa", m.MechanismId); }); });
+    // proximo fator (MFA): re-captura os mecanismos e mantem EMAIL como default
+    var mfa = {};
+    (r.Challenges || []).forEach(function(c){ (c.Mechanisms||[]).forEach(function(m){ mfa[m.Name] = m.MechanismId; }); });
+    if (mfa.EMAIL) bru.setEnvVar("idMechEmail", mfa.EMAIL);
+    if (mfa.SMS) bru.setEnvVar("idMechSms", mfa.SMS);
+    if (mfa.OATH) bru.setEnvVar("idMechOath", mfa.OATH);
+    var keys = Object.keys(mfa);
+    var pref = mfa.EMAIL || mfa.OATH || mfa.SMS || (keys.length ? mfa[keys[0]] : null);
+    if (pref) { bru.setEnvVar("idMechMfa", pref); console.log("Proximo fator = ", (mfa.EMAIL?"EMAIL":(mfa.OATH?"OATH":"SMS")), "| agora rode 3a (envia e-mail) e 3b (codigo). Disponiveis:", keys.join(",")); }
+    else { console.log("Sem proximo desafio — verifique a senha/Status."); }
   }
 }
 
