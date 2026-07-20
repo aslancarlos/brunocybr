@@ -23,11 +23,17 @@ body:json {
 }
 
 script:post-response {
-  const base = bru.getEnvVar("identityUrl");
+  let base = bru.getEnvVar("identityUrl");
   const axios = require("axios");
   const H = { headers: { "Content-Type": "application/json", "X-IDAP-NATIVE-CLIENT": "true" } };
   let r = (res.getBody() && res.getBody().Result) || {};
-  if (r.PodFqdn) { bru.setEnvVar("identityUrl", "https://" + r.PodFqdn); console.log("PodFqdn: identityUrl ajustado para https://" + r.PodFqdn + " -> rode este request de novo."); return; }
+  if (r.PodFqdn) {
+    base = "https://" + r.PodFqdn;
+    bru.setEnvVar("identityUrl", base);
+    console.log("PodFqdn -> re-emitindo StartAuthentication em " + base);
+    const re = await axios.post(base + "/Security/StartAuthentication", { User: bru.getEnvVar("idUser"), Version: "1.0" }, H);
+    r = (re.data && re.data.Result) || {};
+  }
   const sid = r.SessionId;
   bru.setEnvVar("idSessionId", sid);
   bru.setEnvVar("idTenantId", r.TenantId || "");
