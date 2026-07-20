@@ -40,7 +40,15 @@ script:post-response {
     const ar = (a.data && a.data.Result) || {};
     console.log("Apos senha -> Summary:", ar.Summary);
     if (a.data && a.data.success === false) { console.log("FALHA na senha:", a.data.Message); return; }
-    if (ar.Summary === "LoginSuccess" && ar.Token) { bru.setEnvVar("identityBearer", ar.Token); console.log("LoginSuccess (MFA em cache) -> identityBearer gravado. Pule o Submit code."); return; }
+    if (ar.Summary === "LoginSuccess" && ar.Token) {
+      bru.setEnvVar("identityBearer", ar.Token);
+      console.log("LoginSuccess (MFA em cache) -> identityBearer gravado.");
+      try {
+        const cr = await axios.post(bru.getEnvVar("baseUrl") + "/authn-oidc/" + (bru.getEnvVar("oidcServiceId")||"cyberark") + "/" + (bru.getEnvVar("account")||"conjur") + "/authenticate", "id_token=" + encodeURIComponent(ar.Token), { headers: { "Content-Type": "application/x-www-form-urlencoded", "Accept-Encoding": "base64" } });
+        if (cr.status === 200 && cr.data) { bru.setEnvVar("accessToken", typeof cr.data === "string" ? cr.data : JSON.stringify(cr.data)); console.log("Conjur access token gravado em accessToken!"); }
+      } catch (e) { console.log("Nao troquei por access token do Conjur:", (e.response && e.response.data) ? JSON.stringify(e.response.data).slice(0,140) : (e.message||String(e))); }
+      return;
+    }
     let m2 = {};
     (ar.Challenges || []).forEach(function(c){ (c.Mechanisms||[]).forEach(function(m){ m2[m.Name] = m.MechanismId; }); });
     if (m2.EMAIL) bru.setEnvVar("idMechEmail", m2.EMAIL);
