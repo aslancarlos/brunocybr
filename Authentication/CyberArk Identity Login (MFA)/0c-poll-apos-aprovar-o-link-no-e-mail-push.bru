@@ -1,7 +1,7 @@
 meta {
-  name: 2. Advance - password
+  name: 0c. Poll (apos aprovar o LINK no e-mail / push)
   type: http
-  seq: 5
+  seq: 3
 }
 
 post {
@@ -17,11 +17,9 @@ headers {
 
 body:json {
   {
-    "TenantId": "{{idTenantId}}",
     "SessionId": "{{idSessionId}}",
-    "MechanismId": "{{idMechPassword}}",
-    "Action": "Answer",
-    "Answer": "{{idPassword}}"
+    "MechanismId": "{{idMechMfa}}",
+    "Action": "Poll"
   }
 }
 
@@ -45,9 +43,14 @@ script:post-response {
   }
 }
 
+tests {
+  test("nao deu erro", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
 docs {
-  PRIMEIRO FATOR (senha). Rode DEPOIS do 1 e ANTES dos 3x.
-  Se não houver MFA, já retorna LoginSuccess e grava identityBearer.
-  Com MFA (2 fatores), a resposta traz o SEGUNDO desafio e re-grava idMechMfa = E-MAIL (default).
-  Só então o 3a/3b ficam válidos — o mecanismo de e-mail não existe antes da senha ser aceita.
+  Passo final se voce APROVA clicando no LINK do e-mail (em vez de digitar o codigo),
+  ou se usa PUSH no celular. Enquanto pendente retorna OobPending — rode de novo apos aprovar.
+  Quando aprovado, retorna LoginSuccess e grava identityBearer. (Alternativa ao 0b.)
 }

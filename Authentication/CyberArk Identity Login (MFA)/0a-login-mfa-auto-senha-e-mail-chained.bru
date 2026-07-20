@@ -76,7 +76,7 @@ docs {
   FLUXO ENCADEADO (recomendado). Preencha idUser e idPassword e rode ESTE request.
   Ele faz tudo numa sessao so: StartAuthentication -> responde a senha -> dispara o
   codigo por E-MAIL (via axios). Assim nao ha problema de ordem nem de MechanismId.
-  Se a senha bastar (MFA em cache), ja grava identityBearer. Senao, ENVIA o e-mail —
-  veja o console e rode '0b. Submit MFA code' com o codigo. Requer identityUrl no PodFqdn
-  (se vier PodFqdn no console, rode de novo).
+  Se a senha bastar (MFA em cache), ja grava identityBearer. Senao, ENVIA o e-mail.
+  Depois conclua de UMA das formas: DIGITOU o codigo -> rode '0b'; CLICOU no link
+  de aprovacao -> rode '0c' (Poll). Se vier PodFqdn no console, rode este de novo.
 }
