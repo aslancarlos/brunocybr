@@ -51,12 +51,12 @@ script:post-response {
     bru.setEnvVar("idMechMfa", chosen || "");
     if (!chosen) { console.log("Sem 2o fator no retorno (Summary:", ar.Summary + "). Se a senha estiver correta pode nao exigir MFA; caso contrario verifique idPassword."); return; }
     if (emailId) {
-      const s = await axios.post(base + "/Security/AdvanceAuthentication", { SessionId: sid, MechanismId: emailId, Action: "StartOTP" }, H);
+      const s = await axios.post(base + "/Security/AdvanceAuthentication", { SessionId: sid, MechanismId: emailId, Action: "StartOOB" }, H);
       const sr = (s.data && s.data.Result) || {};
       if (s.data && s.data.success !== false && sr.Summary !== "Undefined") {
         console.log("E-mail ENVIADO (Summary:", sr.Summary + "). Verifique o e-mail e rode '0b. Submit MFA code' com idOtp.");
       } else {
-        console.log("StartOTP (e-mail) FALHOU:", (s.data && s.data.Message) || sr.Summary, "-> provavel senha incorreta (idPassword) ou sessao invalida.");
+        console.log("StartOOB (e-mail) FALHOU:", (s.data && s.data.Message) || sr.Summary, "-> provavel senha incorreta (idPassword) ou sessao invalida.");
       }
     } else {
       console.log("Sem e-mail; use OATH/TOTP no '0b. Submit MFA code' (idMechMfa =", chosen + ").");
