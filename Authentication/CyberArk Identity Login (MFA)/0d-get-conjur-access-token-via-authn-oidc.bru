@@ -1,0 +1,46 @@
+meta {
+  name: 0d. Get Conjur access token (via authn-oidc)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/authn-oidc/{{oidcServiceId}}/{{account}}/authenticate
+  body: text
+  auth: none
+}
+
+params:path {
+  oidcServiceId: {{oidcServiceId}}
+  account: {{account}}
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+  Accept-Encoding: base64
+}
+
+body:text {
+  id_token={{identityBearer}}
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 200 && body) {
+    // token base64 (Accept-Encoding: base64) — pronto para o header Authorization
+    bru.setEnvVar("accessToken", typeof body === "string" ? body : JSON.stringify(body));
+  }
+}
+
+tests {
+  test("got conjur token", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
+
+docs {
+  Troca o token do login MFA (identityBearer = Result.Token, que É o id_token OIDC) por um
+  ACCESS TOKEN do Conjur, via authn-oidc/cyberark/conjur/authenticate. Grava em accessToken.
+  O 0b/0c ja fazem isso automaticamente; use este se precisar refazer so a troca.
+  Depois, os requests de Secrets/Policies/Resources funcionam (Authorization: Token token=...).
+}
