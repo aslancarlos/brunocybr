@@ -1,5 +1,5 @@
 meta {
-  name: 3a. Advance - start MFA (send SMS/Email)
+  name: 3a. Advance - send MFA code (EMAIL default)
   type: http
   seq: 3
 }
@@ -24,5 +24,6 @@ body:json {
 }
 
 docs {
-  Dispara o envio do código MFA (SMS/e-mail). PULE se o MFA for app autenticador (TOTP) ou push.
+  Dispara o envio do código MFA. Por PADRÃO idMechMfa = E-MAIL, então isto envia o código
+  por e-mail. Depois rode o 3b com o código. PULE este passo se usar app autenticador (OATH/TOTP).
 }

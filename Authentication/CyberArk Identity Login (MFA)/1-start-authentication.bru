@@ -26,12 +26,20 @@ script:post-response {
   const r = (res.getBody() && res.getBody().Result) || {};
   if (r.SessionId) bru.setEnvVar("idSessionId", r.SessionId);
   if (r.TenantId) bru.setEnvVar("idTenantId", r.TenantId);
+  var mfa = {};
   (r.Challenges || []).forEach(function(c){ (c.Mechanisms||[]).forEach(function(m){
     if (m.Name === "UP") { bru.setEnvVar("idMechPassword", m.MechanismId); }
-    else { bru.setEnvVar("idMechMfa", m.MechanismId); }
+    else { mfa[m.Name] = m.MechanismId; }
   }); });
+  if (mfa.EMAIL) bru.setEnvVar("idMechEmail", mfa.EMAIL);
+  if (mfa.SMS) bru.setEnvVar("idMechSms", mfa.SMS);
+  if (mfa.OATH) bru.setEnvVar("idMechOath", mfa.OATH);
+  // DEFAULT do MFA: EMAIL (fallback: OATH -> SMS -> primeiro disponivel)
+  var keys = Object.keys(mfa);
+  var pref = mfa.EMAIL || mfa.OATH || mfa.SMS || (keys.length ? mfa[keys[0]] : null);
+  if (pref) bru.setEnvVar("idMechMfa", pref);
   if (r.PodFqdn) { bru.setEnvVar("identityUrl", "https://" + r.PodFqdn); console.log("PodFqdn -> identityUrl ajustado para https://" + r.PodFqdn + " (rode este request de novo)."); }
-  console.log("Mechanisms:", JSON.stringify((r.Challenges||[]).map(function(c){return (c.Mechanisms||[]).map(function(m){return m.Name + ":" + m.MechanismId;});})));
+  console.log("MFA default =", (mfa.EMAIL ? "EMAIL" : (mfa.OATH ? "OATH" : (mfa.SMS ? "SMS" : "?"))), "| disponiveis:", keys.join(","));
 }
 
 tests {
@@ -43,7 +51,8 @@ tests {
 
 docs {
   Inicia o login do seu usuário PADRÃO no CyberArk Identity (com MFA).
-  Guarda idSessionId, idTenantId e os MechanismId (senha=UP em idMechPassword; o de MFA em idMechMfa).
-  Se a resposta trouxer PodFqdn (sem Challenges), ajuste identityUrl para https://<PodFqdn> e rode de novo.
-  Veja o console do Bruno para a lista de mecanismos (Name:MechanismId).
+  Guarda idSessionId, idTenantId, idMechPassword e cada mecanismo de MFA (idMechEmail/idMechSms/idMechOath).
+  DEFAULT: idMechMfa = E-MAIL (fallback OATH -> SMS). Para trocar, aponte idMechMfa para idMechSms/idMechOath.
+  Se a resposta trouxer PodFqdn, o identityUrl é auto-ajustado — rode este request de novo.
+  Veja o console do Bruno: 'MFA default = EMAIL | disponiveis: ...'.
 }

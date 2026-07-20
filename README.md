@@ -33,10 +33,11 @@ guarda a collection em texto plano (`.bru`) — versionável e diffável no git.
 
 - **Usuário padrão com MFA** (interativo — recomendado para humanos):
   `Authentication → CyberArk Identity Login (MFA)`. Fluxo `StartAuthentication` →
-  `AdvanceAuthentication` (senha → MFA: OTP/TOTP/SMS/e-mail/push). Não precisa de service
-  user OAuth. Gera `identityBearer`. **Nota:** se o `StartAuthentication` responder com um
-  `PodFqdn`, ajuste `identityUrl` para `https://<PodFqdn>` e repita (roteamento de pod do
-  CyberArk Identity). Tenants antigos usam o domínio `.my.idaptive.app`.
+  `AdvanceAuthentication` (senha → MFA). **Por padrão o MFA é por E-MAIL** (o script escolhe
+  `idMechMfa = EMAIL`, com fallback OATH → SMS). Para trocar, aponte `idMechMfa` para
+  `idMechOath`/`idMechSms`. Fluxo e-mail: `1 Start → 2 senha → 3a envia e-mail → 3b código`.
+  Não precisa de service user OAuth; gera `identityBearer`. Se vier `PodFqdn`, o `identityUrl`
+  é auto-ajustado — repita o Start. Tenants antigos usam o domínio `.my.idaptive.app`.
 - **AWS IAM** (workload): `Authentication → authn-iam` — troca os headers assinados de um
   `STS GetCallerIdentity` por um access token do Conjur.
 - **Service user / IAM do PCloud** (CyberArk Identity / ISPSS): `Authentication → PCloud
