@@ -11,12 +11,13 @@ host factory, certificate authority e as APIs **v2** de workloads/safes/autentic
 Bruno é um cliente HTTP open-source, baseado em arquivos (alternativa ao Postman), que
 guarda a collection em texto plano (`.bru`) — versionável e diffável no git.
 
-## Conteúdo (50 requests em 11 pastas)
+## Conteúdo (50 requests em 10 pastas)
 
 | Pasta | Requests |
 |---|---|
 | **Health and Status** | health, info, whoami, list authenticators, authenticator status (service/GCP), remote health |
 | **Authentication** | login (API key), authenticate (access token), rotate API key, change password, authn-jwt / **authn-iam (AWS)** / authn-azure / authn-gcp / authn-oidc (CyberArk Identity) / authn-k8s / authn-ldap, enable/disable authenticator |
+| &nbsp;&nbsp;↳ **PCloud (ISPSS)** *(subpasta de Authentication)* | get platform token (service user / IAM), token via OAuth2 app alias, List Safes (uso do bearer), exchange platform token → Conjur (authn-oidc) |
 | **Secrets** | retrieve secret, set secret value, batch retrieve |
 | **Policies** | append (POST), replace (PUT), update (PATCH) |
 | **Resources** | list (global / por account / por kind), show resource |
@@ -25,7 +26,6 @@ guarda a collection em texto plano (`.bru`) — versionável e diffável no git.
 | **Public Keys** | show public keys |
 | **Certificate Authority** | sign certificate (CSR) |
 | **SaaS v2 APIs** | batch retrieve (até 250), add group member, update authenticator, create/delete workload |
-| **PCloud Authentication (ISPSS)** | get platform token (service user / IAM), token via OAuth2 app alias, List Safes (uso do bearer), exchange platform token → Conjur (authn-oidc) |
 
 ### Autenticação como "usuário IAM"
 
