@@ -1,0 +1,48 @@
+meta {
+  name: 3b. Advance - answer MFA (OTP/TOTP)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{identityUrl}}/Security/AdvanceAuthentication
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-IDAP-NATIVE-CLIENT: true
+}
+
+body:json {
+  {
+    "SessionId": "{{idSessionId}}",
+    "MechanismId": "{{idMechMfa}}",
+    "Action": "Answer",
+    "Answer": "{{idOtp}}"
+  }
+}
+
+script:post-response {
+  const r = (res.getBody() && res.getBody().Result) || {};
+  console.log("Summary:", r.Summary);
+  if (r.Summary === "LoginSuccess" && r.Token) {
+    bru.setEnvVar("identityBearer", r.Token);
+    console.log("LoginSuccess -> identityBearer gravado.");
+  } else {
+    (r.Challenges || []).forEach(function(c){ (c.Mechanisms||[]).forEach(function(m){ bru.setEnvVar("idMechMfa", m.MechanismId); }); });
+  }
+}
+
+tests {
+  test("login success", function() {
+    const r = res.getBody().Result || {};
+    expect(r.Summary).to.equal("LoginSuccess");
+  });
+}
+
+docs {
+  Responde o código MFA (OTP do SMS/e-mail ou TOTP do app). Em sucesso, grava identityBearer.
+  Coloque o código em idOtp antes de rodar.
+}

@@ -1,0 +1,40 @@
+meta {
+  name: 3c. Advance - poll (push notification)
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{identityUrl}}/Security/AdvanceAuthentication
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-IDAP-NATIVE-CLIENT: true
+}
+
+body:json {
+  {
+    "SessionId": "{{idSessionId}}",
+    "MechanismId": "{{idMechMfa}}",
+    "Action": "Poll"
+  }
+}
+
+script:post-response {
+  const r = (res.getBody() && res.getBody().Result) || {};
+  console.log("Summary:", r.Summary);
+  if (r.Summary === "LoginSuccess" && r.Token) {
+    bru.setEnvVar("identityBearer", r.Token);
+    console.log("LoginSuccess -> identityBearer gravado.");
+  } else {
+    (r.Challenges || []).forEach(function(c){ (c.Mechanisms||[]).forEach(function(m){ bru.setEnvVar("idMechMfa", m.MechanismId); }); });
+  }
+}
+
+docs {
+  Para MFA por PUSH (mobile): rode repetidamente até Summary=LoginSuccess (aprove no celular).
+  Em sucesso, grava identityBearer.
+}

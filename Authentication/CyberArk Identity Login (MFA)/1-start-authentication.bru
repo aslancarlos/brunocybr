@@ -1,0 +1,49 @@
+meta {
+  name: 1. Start authentication
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{identityUrl}}/Security/StartAuthentication
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-IDAP-NATIVE-CLIENT: true
+}
+
+body:json {
+  {
+    "User": "{{idUser}}",
+    "Version": "1.0"
+  }
+}
+
+script:post-response {
+  const r = (res.getBody() && res.getBody().Result) || {};
+  if (r.SessionId) bru.setEnvVar("idSessionId", r.SessionId);
+  if (r.TenantId) bru.setEnvVar("idTenantId", r.TenantId);
+  (r.Challenges || []).forEach(function(c){ (c.Mechanisms||[]).forEach(function(m){
+    if (m.Name === "UP") { bru.setEnvVar("idMechPassword", m.MechanismId); }
+    else { bru.setEnvVar("idMechMfa", m.MechanismId); }
+  }); });
+  if (r.PodFqdn) { bru.setEnvVar("identityUrl", "https://" + r.PodFqdn); console.log("PodFqdn -> identityUrl ajustado para https://" + r.PodFqdn + " (rode este request de novo)."); }
+  console.log("Mechanisms:", JSON.stringify((r.Challenges||[]).map(function(c){return (c.Mechanisms||[]).map(function(m){return m.Name + ":" + m.MechanismId;});})));
+}
+
+tests {
+  test("started", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().success).to.equal(true);
+  });
+}
+
+docs {
+  Inicia o login do seu usuário PADRÃO no CyberArk Identity (com MFA).
+  Guarda idSessionId, idTenantId e os MechanismId (senha=UP em idMechPassword; o de MFA em idMechMfa).
+  Se a resposta trouxer PodFqdn (sem Challenges), ajuste identityUrl para https://<PodFqdn> e rode de novo.
+  Veja o console do Bruno para a lista de mecanismos (Name:MechanismId).
+}

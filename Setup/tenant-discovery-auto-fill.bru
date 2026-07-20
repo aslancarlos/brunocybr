@@ -1,0 +1,49 @@
+meta {
+  name: Tenant Discovery (auto-fill)
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://platform-discovery.cyberark.cloud/api/public/tenant-discovery?bySubdomain={{subdomain}}
+  body: none
+  auth: none
+}
+
+params:query {
+  bySubdomain: {{subdomain}}
+}
+
+script:post-response {
+  const d = res.getBody() || {};
+  function api(name){ const s=(d.services||[]).find(function(x){return x.service_name===name;});
+    return (s && s.endpoints && s.endpoints[0]) ? s.endpoints[0].api : null; }
+  function set(k,v){ if(v){ bru.setEnvVar(k, String(v).replace(/\/$/, "")); } }
+  set("baseUrl", api("secrets_manager"));
+  set("pcloudUrl", api("pcloud"));
+  set("identityUrl", api("identity_administration") || api("identity_user_portal"));
+  set("secretsHubUrl", api("secrets_hub"));
+  bru.setEnvVar("account", "conjur");
+  bru.setEnvVar("oidcServiceId", "cyberark");
+  if (d.tenant_id) bru.setEnvVar("tenantId", d.tenant_id);
+  if (d.identity_id) bru.setEnvVar("identityId", d.identity_id);
+  console.log("region:", d.region, "| identity_id:", d.identity_id);
+  console.log("baseUrl   =", bru.getEnvVar("baseUrl"));
+  console.log("pcloudUrl =", bru.getEnvVar("pcloudUrl"));
+  console.log("identityUrl =", bru.getEnvVar("identityUrl"));
+}
+
+tests {
+  test("discovery ok", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("services");
+  });
+}
+
+docs {
+  PREENCHA APENAS a variável {{subdomain}} (ex.: latamlab) e rode este request PRIMEIRO.
+  Ele consulta o endpoint público de discovery da CyberArk e preenche automaticamente:
+  baseUrl (secrets_manager), pcloudUrl, identityUrl (identity_administration),
+  secretsHubUrl, account=conjur, oidcServiceId=cyberark, tenantId e identityId.
+  Endpoint público, sem autenticação. Veja o console do Bruno para os valores preenchidos.
+}

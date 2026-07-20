@@ -1,4 +1,5 @@
 vars {
+  subdomain: your-subdomain
   baseUrl: https://example-tenant.secretsmgr.cyberark.cloud/api
   account: conjur
   login: admin
@@ -28,9 +29,20 @@ vars {
   workloadName: my-app
   safeName: my-safe
   identityUrl: https://example-tenant.id.cyberark.cloud
+  secretsHubUrl: https://example-tenant.secretshub.cyberark.cloud/api
+  tenantId: run-Tenant-Discovery-to-populate
+  identityId: run-Tenant-Discovery-to-populate
   pcloudUrl: https://example-tenant.privilegecloud.cyberark.cloud
   pcloudServiceUser: svc-conjur-api@example-tenant
   pcloudServiceSecret: ChangeMe-Service-User-Secret
   pcloudAppAlias: __idaptive_cybr_user_oidc
   pcloudToken: run-Get-platform-token-to-populate
+  idUser: user@example.com
+  idPassword: ChangeMe-Your-Identity-Password
+  idOtp: 000000
+  idSessionId: run-Start-authentication-to-populate
+  idTenantId: run-Start-authentication-to-populate
+  idMechPassword: run-Start-authentication-to-populate
+  idMechMfa: run-Start-authentication-to-populate
+  identityBearer: run-login-to-populate
 }

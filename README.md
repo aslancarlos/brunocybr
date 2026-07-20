@@ -11,13 +11,15 @@ host factory, certificate authority e as APIs **v2** de workloads/safes/autentic
 Bruno é um cliente HTTP open-source, baseado em arquivos (alternativa ao Postman), que
 guarda a collection em texto plano (`.bru`) — versionável e diffável no git.
 
-## Conteúdo (50 requests em 10 pastas)
+## Conteúdo (56 requests em 11 pastas)
 
 | Pasta | Requests |
 |---|---|
+| **Setup** | **Tenant Discovery (auto-fill)** — preencha só o `subdomain` e ele descobre e preenche `baseUrl`, `pcloudUrl`, `identityUrl`, `account`, `tenantId`, `identityId` |
 | **Health and Status** | health, info, whoami, list authenticators, authenticator status (service/GCP), remote health |
 | **Authentication** | login (API key), authenticate (access token), rotate API key, change password, authn-jwt / **authn-iam (AWS)** / authn-azure / authn-gcp / authn-oidc (CyberArk Identity) / authn-k8s / authn-ldap, enable/disable authenticator |
 | &nbsp;&nbsp;↳ **PCloud (ISPSS)** *(subpasta de Authentication)* | get platform token (service user / IAM), token via OAuth2 app alias, List Safes (uso do bearer), exchange platform token → Conjur (authn-oidc) |
+| &nbsp;&nbsp;↳ **CyberArk Identity Login (MFA)** *(subpasta de Authentication)* | login do **usuário padrão com MFA**: 1. StartAuthentication → 2. Advance (senha) → 3a. start MFA (SMS/e-mail) / 3b. answer MFA (OTP/TOTP) / 3c. poll (push) |
 | **Secrets** | retrieve secret, set secret value, batch retrieve |
 | **Policies** | append (POST), replace (PUT), update (PATCH) |
 | **Resources** | list (global / por account / por kind), show resource |
@@ -27,15 +29,20 @@ guarda a collection em texto plano (`.bru`) — versionável e diffável no git.
 | **Certificate Authority** | sign certificate (CSR) |
 | **SaaS v2 APIs** | batch retrieve (até 250), add group member, update authenticator, create/delete workload |
 
-### Autenticação como "usuário IAM"
+### Formas de autenticar
 
+- **Usuário padrão com MFA** (interativo — recomendado para humanos):
+  `Authentication → CyberArk Identity Login (MFA)`. Fluxo `StartAuthentication` →
+  `AdvanceAuthentication` (senha → MFA: OTP/TOTP/SMS/e-mail/push). Não precisa de service
+  user OAuth. Gera `identityBearer`. **Nota:** se o `StartAuthentication` responder com um
+  `PodFqdn`, ajuste `identityUrl` para `https://<PodFqdn>` e repita (roteamento de pod do
+  CyberArk Identity). Tenants antigos usam o domínio `.my.idaptive.app`.
 - **AWS IAM** (workload): `Authentication → authn-iam` — troca os headers assinados de um
   `STS GetCallerIdentity` por um access token do Conjur.
-- **Usuário de serviço / IAM do PCloud** (CyberArk Identity / ISPSS): `PCloud Authentication
-  (ISPSS) → Get platform token` — OAuth2 `client_credentials` no
-  `https://<subdomain>.id.cyberark.cloud/oauth2/platformtoken`, retornando o bearer usado
-  nas APIs do Privilege Cloud (mesmo fluxo do `cybr-cli -a identity` / psPAS). O request
-  de exchange mostra como levar essa identidade ao Conjur Cloud via `authn-oidc`.
+- **Service user / IAM do PCloud** (CyberArk Identity / ISPSS): `Authentication → PCloud
+  (ISPSS) → Get platform token` — OAuth2 `client_credentials` no `/oauth2/platformtoken`,
+  bearer para as APIs do Privilege Cloud (fluxo do `cybr-cli -a identity` / psPAS).
+  ⚠️ Exige um **service user** dedicado, não funciona com usuário interativo/humano.
 
 Base v1 gerada a partir do [OpenAPI oficial do Conjur](https://github.com/cyberark/conjur-openapi-spec);
 adições v2 conforme a [documentação Secrets Manager SaaS](https://docs.cyberark.com/secrets-manager-saas/latest/en/content/developer/lp_rest_api.htm).
@@ -45,23 +52,33 @@ adições v2 conforme a [documentação Secrets Manager SaaS](https://docs.cyber
 1. Instale o [Bruno](https://www.usebruno.com/downloads).
 2. Clone este repositório.
 3. No Bruno: **Open Collection** → aponte para a pasta clonada.
-4. Selecione o environment **SaaS Example** (canto superior direito) e ajuste os
-   valores para o seu tenant — veja a tabela abaixo.
-5. Rode na ordem: **LOGIN (get API key)** → **AUTHENTICATE (get access token)**.
-   Os scripts guardam `apiKey` e `accessToken` no environment automaticamente; os demais
-   requests já usam o header `Authorization: Token token="{{accessToken}}"`.
+4. Selecione o environment **SaaS Example** e preencha **apenas o `subdomain`**
+   (ex.: `latamlab`). Rode **`Setup → Tenant Discovery (auto-fill)`** — ele preenche
+   sozinho `baseUrl`, `pcloudUrl`, `identityUrl`, `account`, `oidcServiceId`, `tenantId`
+   e `identityId` a partir do endpoint público de discovery da CyberArk.
+5. Autentique conforme o caso:
+   - **Você (humano, com MFA):** `Authentication → CyberArk Identity Login (MFA)` →
+     `1. Start authentication` → `2. Advance (senha)` → `3b. Advance (OTP/TOTP)`
+     (ou `3a`/`3c` para SMS-email/push).
+   - **Workload/host:** rode `authn-jwt` / `authn-iam` / etc.
+   - **Conjur nativo:** `LOGIN` → `AUTHENTICATE` (não vale para usuário SaaS — use MFA/OIDC).
+   Os scripts guardam os tokens (`accessToken`, `identityBearer`, …) no environment.
 
 > Para workloads (não-humanos), pule o LOGIN e rode direto o `authn-jwt` / `authn-iam` /
 > `authn-oidc` correspondente — o access token é gravado da mesma forma.
 
 ## Environment (`environments/SaaS Example.bru`) — variáveis e exemplos
 
-Todos os valores são **exemplos genéricos**; troque pelos do seu ambiente.
+Na prática **você só precisa preencher `subdomain`** e rodar o Tenant Discovery — o resto
+é preenchido sozinho. As demais variáveis abaixo são só para requests específicos.
 
 | Variável | Exemplo | Observação |
 |---|---|---|
-| `baseUrl` | `https://example-tenant.secretsmgr.cyberark.cloud/api` | URL da API do tenant |
-| `account` | `conjur` | account do Conjur Cloud (normalmente `conjur`) |
+| **`subdomain`** ⭐ | `latamlab` | **a única obrigatória** — o Tenant Discovery deriva o resto |
+| `baseUrl` | `https://example-tenant.secretsmgr.cyberark.cloud/api` | 🔄 auto (Discovery) — URL da API do Conjur |
+| `pcloudUrl` / `identityUrl` | — | 🔄 auto (Discovery) |
+| `tenantId` / `identityId` | — | 🔄 auto (Discovery) |
+| `account` | `conjur` | 🔄 auto (Discovery) — normalmente `conjur` |
 | `login` | `admin` | usuário ou host id |
 | `password` | `ChangeMe-Example-Passw0rd` | senha (Basic Auth do LOGIN) |
 | `apiKey` | *(preenchido pelo LOGIN)* | |
@@ -81,6 +98,11 @@ Todos os valores são **exemplos genéricos**; troque pelos do seu ambiente.
 | `pcloudServiceUser` / `pcloudServiceSecret` | `svc-conjur-api@example-tenant` / *(exemplo)* | usuário IAM/serviço + segredo (client_credentials) |
 | `pcloudAppAlias` | `__idaptive_cybr_user_oidc` | app alias do OAuth2 client (variante) |
 | `pcloudToken` | *(preenchido pelo Get platform token)* | bearer para as APIs do PCloud |
+| `idUser` | `user@example.com` | seu usuário padrão do CyberArk Identity (login MFA) |
+| `idPassword` | *(sua senha)* | senha do usuário no fluxo MFA |
+| `idOtp` | *(código do MFA)* | OTP/TOTP do SMS/e-mail/app autenticador |
+| `idSessionId` / `idTenantId` / `idMechPassword` / `idMechMfa` | *(preenchidos pelo StartAuthentication)* | sessão + ids dos mecanismos |
+| `identityBearer` | *(preenchido no LoginSuccess)* | token de sessão do CyberArk Identity |
 
 ## Notas importantes
 
